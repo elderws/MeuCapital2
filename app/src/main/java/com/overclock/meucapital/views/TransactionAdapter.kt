@@ -3,7 +3,8 @@ package com.overclock.meucapital.views
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.overclock.meucapital.MainActivity
@@ -32,7 +33,7 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
         private val tvValor: TextView = itemView.findViewById(R.id.tvValor)
         private val tvData: TextView = itemView.findViewById(R.id.tvData)
         private val tvTipo: TextView = itemView.findViewById(R.id.tvTipo)
-        private val btnDelete: Button = itemView.findViewById(R.id.btnDelete)
+        private val btnDetails: ImageButton = itemView.findViewById(R.id.btnDetails)
 
         fun bind(transaction: Transaction) {
             tvDescricao.text = transaction.descricao
@@ -40,10 +41,24 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
             tvData.text = transaction.data
             tvTipo.text = transaction.tipo
 
-
-            btnDelete.setOnClickListener {
-                dbHandler.deleteTransaction(transaction.id)
-                (itemView.context as MainActivity).updateRecyclerView()
+            btnDetails.setOnClickListener {
+                val popupMenu = PopupMenu(itemView.context, btnDetails)
+                popupMenu.menuInflater.inflate(R.layout.transaction_options_menu, popupMenu.menu)
+                popupMenu.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_delete -> {
+                            dbHandler.deleteTransaction(transaction.id)
+                            (itemView.context as MainActivity).updateRecyclerView()
+                            true
+                        }
+                        R.id.action_edit -> {
+                            // Implementar lógica de edição
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                popupMenu.show()
             }
         }
     }
