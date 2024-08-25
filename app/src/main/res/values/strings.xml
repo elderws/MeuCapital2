@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MeuCapital</string>
+    <string-array name="tipo_array">
+        <item>Crédito</item>
+        <item>Débito</item>
+    </string-array>
 </resources>

@@ -31,12 +31,15 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
         private val tvDescricao: TextView = itemView.findViewById(R.id.tvDescricao)
         private val tvValor: TextView = itemView.findViewById(R.id.tvValor)
         private val tvData: TextView = itemView.findViewById(R.id.tvData)
+        private val tvTipo: TextView = itemView.findViewById(R.id.tvTipo)
         private val btnDelete: Button = itemView.findViewById(R.id.btnDelete)
 
         fun bind(transaction: Transaction) {
             tvDescricao.text = transaction.descricao
             tvValor.text = transaction.valor.toString()
             tvData.text = transaction.data
+            tvTipo.text = transaction.tipo
+
 
             btnDelete.setOnClickListener {
                 dbHandler.deleteTransaction(transaction.id)

@@ -20,10 +20,8 @@ class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTable = ("CREATE TABLE " + TABLE_NAME + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_DESCRICAO + " TEXT,"
-                + KEY_TIPO + " TEXT," + KEY_VALOR + " DOUBLE," + KEY_DATA + " TEXT" + ")")
-        db.execSQL(createTable)
+        val createTransactionsTable = ("CREATE TABLE $TABLE_NAME ($KEY_ID INTEGER PRIMARY KEY, $KEY_DESCRICAO TEXT, $KEY_TIPO TEXT, $KEY_VALOR REAL, $KEY_DATA TEXT)")
+        db.execSQL(createTransactionsTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -35,10 +33,11 @@ class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         onUpgrade(db, oldVersion, newVersion)
     }
 
-    fun addTransaction(descricao: String, valor: Double, data: String): Long {
+    fun addTransaction(descricao: String, tipo: String, valor: Double, data: String): Long {
         val db = this.writableDatabase
         val contentValues = ContentValues()
         contentValues.put(KEY_DESCRICAO, descricao)
+        contentValues.put(KEY_TIPO, tipo)
         contentValues.put(KEY_VALOR, valor)
         contentValues.put(KEY_DATA, data)
         val success = db.insert(TABLE_NAME, null, contentValues)
