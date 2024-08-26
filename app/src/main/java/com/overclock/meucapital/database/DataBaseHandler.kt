@@ -10,8 +10,9 @@ class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     companion object {
         private const val DATABASE_VERSION = 1
-        private const val DATABASE_NAME = "transactionsDB"
+        private const val DATABASE_NAME = "transactions.db"
         private const val TABLE_TRANSACTIONS = "transactions"
+
         private const val KEY_ID = "id"
         private const val KEY_DESCRICAO = "descricao"
         private const val KEY_VALOR = "valor"
@@ -19,44 +20,73 @@ class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         private const val KEY_TIPO = "tipo"
     }
 
-    override fun onCreate(db: SQLiteDatabase?) {
-        val createTransactionsTable = ("CREATE TABLE $TABLE_TRANSACTIONS ("
-                + "$KEY_ID INTEGER PRIMARY KEY,"
+    override fun onCreate(db: SQLiteDatabase) {
+        val createTable = ("CREATE TABLE $TABLE_TRANSACTIONS ("
+                + "$KEY_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "$KEY_DESCRICAO TEXT,"
                 + "$KEY_VALOR REAL,"
                 + "$KEY_DATA TEXT,"
                 + "$KEY_TIPO TEXT)")
-        db?.execSQL(createTransactionsTable)
+        db.execSQL(createTable)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL("DROP TABLE IF EXISTS $TABLE_TRANSACTIONS")
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_TRANSACTIONS")
         onCreate(db)
     }
 
-    fun addTransaction(descricao: String, tipo: String, valor: Double, data: String): Long {
+    fun addTransaction(transaction: Transaction) {
         val db = this.writableDatabase
-        val contentValues = ContentValues().apply {
-            put(KEY_DESCRICAO, descricao)
-            put(KEY_VALOR, valor)
-            put(KEY_DATA, data)
-            put(KEY_TIPO, tipo)
-        }
-        val success = db.insert(TABLE_TRANSACTIONS, null, contentValues)
+        val values = ContentValues()
+        values.put(KEY_DESCRICAO, transaction.descricao)
+        values.put(KEY_VALOR, transaction.valor)
+        values.put(KEY_DATA, transaction.data)
+        values.put(KEY_TIPO, transaction.tipo)
+
+        db.insert(TABLE_TRANSACTIONS, null, values)
         db.close()
-        return success
     }
 
-    fun clearDatabase() {
-        val db = this.writableDatabase
-        db.delete(TABLE_TRANSACTIONS, null, null)
+    fun getTransaction(id: Int): Transaction? {
+        val db = this.readableDatabase
+        val cursor = db.query(
+            TABLE_TRANSACTIONS, arrayOf(KEY_ID, KEY_DESCRICAO, KEY_VALOR, KEY_DATA, KEY_TIPO),
+            "$KEY_ID=?", arrayOf(id.toString()), null, null, null, null
+        )
+        cursor?.moveToFirst()
+        val transaction = if (cursor != null && cursor.count > 0) {
+            Transaction(
+                id = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)),
+                descricao = cursor.getString(cursor.getColumnIndexOrThrow(KEY_DESCRICAO)),
+                valor = cursor.getDouble(cursor.getColumnIndexOrThrow(KEY_VALOR)),
+                data = cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATA)),
+                tipo = cursor.getString(cursor.getColumnIndexOrThrow(KEY_TIPO))
+            )
+        } else {
+            null
+        }
+        cursor?.close()
         db.close()
+        return transaction
+    }
+
+    fun updateTransaction(transaction: Transaction): Int {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(KEY_DESCRICAO, transaction.descricao)
+        values.put(KEY_VALOR, transaction.valor)
+        values.put(KEY_DATA, transaction.data)
+        values.put(KEY_TIPO, transaction.tipo)
+
+        return db.update(TABLE_TRANSACTIONS, values, "$KEY_ID=?", arrayOf(transaction.id.toString()))
     }
 
     fun getAllTransactions(): List<Transaction> {
-        val transactions = mutableListOf<Transaction>()
+        val transactionList: MutableList<Transaction> = ArrayList()
+        val selectQuery = "SELECT * FROM $TABLE_TRANSACTIONS"
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_TRANSACTIONS", null)
+        val cursor = db.rawQuery(selectQuery, null)
+
         if (cursor.moveToFirst()) {
             do {
                 val transaction = Transaction(
@@ -66,52 +96,22 @@ class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
                     data = cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATA)),
                     tipo = cursor.getString(cursor.getColumnIndexOrThrow(KEY_TIPO))
                 )
-                transactions.add(transaction)
+                transactionList.add(transaction)
             } while (cursor.moveToNext())
         }
+
         cursor.close()
         db.close()
-        return transactions
+        return transactionList
     }
 
-    fun deleteTransaction(id: Int) {
+    fun deleteTransaction(id: Int): Int {
         val db = this.writableDatabase
-        db.delete(TABLE_TRANSACTIONS, "$KEY_ID = ?", arrayOf(id.toString()))
+        return db.delete(TABLE_TRANSACTIONS, "$KEY_ID=?", arrayOf(id.toString()))
+    }
+    fun clearAllTransactions() {
+        val db = this.writableDatabase
+        db.execSQL("DELETE FROM $TABLE_TRANSACTIONS")
         db.close()
-    }
-
-    fun updateTransaction(transaction: Transaction): Int {
-        val db = this.writableDatabase
-        val contentValues = ContentValues().apply {
-            put(KEY_DESCRICAO, transaction.descricao)
-            put(KEY_VALOR, transaction.valor)
-            put(KEY_DATA, transaction.data)
-            put(KEY_TIPO, transaction.tipo)
-        }
-        return db.update(TABLE_TRANSACTIONS, contentValues, "$KEY_ID = ?", arrayOf(transaction.id.toString()))
-    }
-
-    fun getTransaction(id: Int): Transaction? {
-        val db = this.readableDatabase
-        val cursor = db.query(
-            TABLE_TRANSACTIONS, arrayOf(KEY_ID, KEY_DESCRICAO, KEY_VALOR, KEY_DATA, KEY_TIPO),
-            "$KEY_ID = ?", arrayOf(id.toString()), null, null, null
-        )
-        return if (cursor != null && cursor.moveToFirst()) {
-            val transaction = Transaction(
-                id = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)),
-                descricao = cursor.getString(cursor.getColumnIndexOrThrow(KEY_DESCRICAO)),
-                valor = cursor.getDouble(cursor.getColumnIndexOrThrow(KEY_VALOR)),
-                data = cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATA)),
-                tipo = cursor.getString(cursor.getColumnIndexOrThrow(KEY_TIPO))
-            )
-            cursor.close()
-            db.close()
-            transaction
-        } else {
-            cursor?.close()
-            db.close()
-            null
-        }
     }
 }

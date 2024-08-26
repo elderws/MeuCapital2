@@ -30,16 +30,26 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, AddTransactionActivity::class.java)
             startActivityForResult(intent, 1)
         }
+
+        val btnClearDatabase: Button = findViewById(R.id.btnClearDatabase)
+        btnClearDatabase.setOnClickListener {
+            clearDatabase()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1 && resultCode == RESULT_OK) {
+        if ((requestCode == 1 || requestCode == 2) && resultCode == RESULT_OK) {
             updateRecyclerView()
         }
     }
 
-    fun updateRecyclerView() {
+    private fun clearDatabase() {
+        dbHandler.clearAllTransactions()
+        updateRecyclerView()
+    }
+
+    public fun updateRecyclerView() {
         val transactions: List<Transaction> = dbHandler.getAllTransactions()
         transactionAdapter = TransactionAdapter(transactions, dbHandler)
         recyclerView.adapter = transactionAdapter

@@ -1,38 +1,131 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".EditTransactionActivity">
 
-    <EditText
-        android:id="@+id/etDescricao"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Descrição" />
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
 
-    <EditText
-        android:id="@+id/etValor"
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Editar Transação"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Valor"
-        android:inputType="numberDecimal" />
+        android:orientation="vertical"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="28dp">
 
-    <EditText
-        android:id="@+id/etData"
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etDescricao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            android:drawableStart="@drawable/ic_description"
+            android:drawablePadding="18dp"
+            android:hint="Descrição"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Data" />
+        android:orientation="vertical"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="28dp">
 
-    <EditText
-        android:id="@+id/etTipo"
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etValor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            android:drawableStart="@drawable/ic_money"
+            android:drawablePadding="8dp"
+            android:hint="Valor"
+            android:inputType="numberDecimal"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tipo" />
+        android:layout_marginTop="24dp"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp">
 
-    <Button
-        android:id="@+id/btnSave"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:drawableStart="@drawable/ic_calendar"
+            android:drawablePadding="18dp"
+            android:focusable="true"
+            android:hint="Data Lancamento"
+            android:padding="12dp"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutChild"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Salvar" />
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:layout_marginStart="16dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            app:srcCompat="@drawable/ic_spinner" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/spinnerTipo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:drawableStart="@drawable/ic_calendar"
+            android:drawablePadding="8dp"
+            android:entries="@array/tipo_array"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="56dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#673AB7"
+            android:text="Salvar"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+    </LinearLayout>
 
 </LinearLayout>

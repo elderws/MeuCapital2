@@ -4,9 +4,9 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
+import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
 import com.overclock.meucapital.EditTransactionActivity
 import com.overclock.meucapital.MainActivity
@@ -17,13 +17,12 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
     RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_transaction, parent, false)
-        return TransactionViewHolder(itemView)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_transaction, parent, false)
+        return TransactionViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        val transaction = transactions[position]
-        holder.bind(transaction)
+        holder.bind(transactions[position])
     }
 
     override fun getItemCount(): Int {
@@ -35,7 +34,7 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
         private val tvValor: TextView = itemView.findViewById(R.id.tvValor)
         private val tvData: TextView = itemView.findViewById(R.id.tvData)
         private val tvTipo: TextView = itemView.findViewById(R.id.tvTipo)
-        private val btnDetails: ImageButton = itemView.findViewById(R.id.btnDetails)
+        private val btnOptions: ImageButton = itemView.findViewById(R.id.btnOptions)
 
         fun bind(transaction: Transaction) {
             tvDescricao.text = transaction.descricao
@@ -43,26 +42,28 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
             tvData.text = transaction.data
             tvTipo.text = transaction.tipo
 
-            btnDetails.setOnClickListener {
-                val popupMenu = PopupMenu(itemView.context, btnDetails)
-                popupMenu.menuInflater.inflate(R.layout.transaction_options_menu, popupMenu.menu)
-                popupMenu.setOnMenuItemClickListener { menuItem ->
-                    when (menuItem.itemId) {
-                        R.id.action_delete -> {
-                            dbHandler.deleteTransaction(transaction.id)
-                            (itemView.context as MainActivity).updateRecyclerView()
-                            true
-                        }
+            btnOptions.setOnClickListener {
+                val popup = PopupMenu(itemView.context, it)
+                popup.inflate(R.menu.transaction_options_menu)
+                popup.setOnMenuItemClickListener { item ->
+                    when (item.itemId) {
                         R.id.action_edit -> {
                             val intent = Intent(itemView.context, EditTransactionActivity::class.java)
                             intent.putExtra("TRANSACTION_ID", transaction.id)
-                            itemView.context.startActivity(intent)
+                            (itemView.context as MainActivity).startActivityForResult(intent, 2)
+                            true
+                        }
+                        R.id.action_delete -> {
+                            transaction.id?.let { id ->
+                                dbHandler.deleteTransaction(id)
+                                (itemView.context as MainActivity).updateRecyclerView()
+                            }
                             true
                         }
                         else -> false
                     }
                 }
-                popupMenu.show()
+                popup.show()
             }
         }
     }
