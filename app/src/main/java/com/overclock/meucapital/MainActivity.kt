@@ -7,10 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.overclock.meucapital.database.DataBaseHandler
+import com.overclock.meucapital.views.Transaction
 import com.overclock.meucapital.views.TransactionAdapter
 
 class MainActivity : AppCompatActivity() {
     private lateinit var dbHandler: DataBaseHandler
+    private lateinit var transactionAdapter: TransactionAdapter
     private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,31 +23,25 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        updateRecyclerView()
+
         val btnAddTransaction: Button = findViewById(R.id.btnAddTransaction)
         btnAddTransaction.setOnClickListener {
             val intent = Intent(this, AddTransactionActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, 1)
         }
+    }
 
-        val btnClearDatabase: Button = findViewById(R.id.btnClearDatabase)
-        btnClearDatabase.setOnClickListener {
-            dbHandler.clearDatabase()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             updateRecyclerView()
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        updateRecyclerView()
-    }
-
     fun updateRecyclerView() {
-        val transactions = dbHandler.getAllTransactions()
-        recyclerView.adapter = TransactionAdapter(transactions, dbHandler)
-    }
-
-    fun deleteTransaction(id: Int) {
-        dbHandler.deleteTransaction(id)
-        updateRecyclerView()
+        val transactions: List<Transaction> = dbHandler.getAllTransactions()
+        transactionAdapter = TransactionAdapter(transactions, dbHandler)
+        recyclerView.adapter = transactionAdapter
     }
 }

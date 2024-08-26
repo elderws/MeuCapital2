@@ -1,5 +1,6 @@
 package com.overclock.meucapital
 
+import android.app.Activity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -26,6 +27,7 @@ class AddTransactionActivity : AppCompatActivity() {
             val data = etData.text.toString()
             val tipo = spinnerTipo.selectedItem.toString()
             dbHandler.addTransaction(descricao, tipo, valor, data)
+            setResult(Activity.RESULT_OK)
             finish() // Fecha a atividade após salvar a transação
         }
     }

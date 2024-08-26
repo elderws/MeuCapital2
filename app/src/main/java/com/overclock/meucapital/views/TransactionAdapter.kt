@@ -1,5 +1,6 @@
 package com.overclock.meucapital.views
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.overclock.meucapital.EditTransactionActivity
 import com.overclock.meucapital.MainActivity
 import com.overclock.meucapital.R
 import com.overclock.meucapital.database.DataBaseHandler
@@ -52,7 +54,9 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
                             true
                         }
                         R.id.action_edit -> {
-                            // Implementar lógica de edição
+                            val intent = Intent(itemView.context, EditTransactionActivity::class.java)
+                            intent.putExtra("TRANSACTION_ID", transaction.id)
+                            itemView.context.startActivity(intent)
                             true
                         }
                         else -> false
